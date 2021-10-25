@@ -67,7 +67,7 @@
       productContainer.innerHTML += `<div class="col-4">
         <div class="p-2">
           <div>
-            <img src=${product.imageUrl} alt="" style="width: 100%; height: 200px; object-fit: cover;">
+            <img src=${product.imageUrl || "https://intellisyn.com/wp-content/uploads/2017/10/635987969499750673724555390_for_dummies_plain.png"} alt="" style="width: 100%; height: 200px; object-fit: cover;">
           </div>
           <div class="mt-2 d-flex flex-column justify-content-between">
             <h6 class="p-0 m-0">${product.brand}</h6>
