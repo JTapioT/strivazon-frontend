@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+      integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+      crossorigin="anonymous"
+    />
+    <title>Document</title>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav
+      class="
+        navbar navbar-light
+        bg-light
+        justify-content-start
+        align-items-baseline
+      "
+    >
+      <a class="navbar-brand" href="./index.html">
+        <img
+          src="https://coursereport-s3-production.global.ssl.fastly.net/rich/rich_files/rich_files/6256/s300/strive-20school-20logo.png"
+          width="30"
+          height="30"
+          class="d-inline-block align-top"
+          alt=""
+        />
+        Strivazon
+      </a>
+      <div>
+        <ul class="navbar-nav flex-row">
+          <li class="nav-item mr-3">
+            <a class="nav-link p-0" href="./index.html"
+              >Home<span class="sr-only">(current)</span></a
+            >
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link p-0" href="./backoffice.html">Back Office</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Form -->
+    <div class="container">
+      <h2 class="text-center mt-4">Product details</h2>
+      <div class="row justify-content-center mt-3">
+        <div class="col-md-8 formContainer">
+          <form>
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input
+                id="name"
+                type="text"
+                class="form-control"
+                placeholder="Insert name of product"
+              />
+            </div>
+              <label for="description">Description</label>
+              <textarea
+                id="description"
+                type="text"
+                class="form-control"
+                placeholder="Insert description of a product"
+                rows="10"
+              ></textarea>
+            <div class="form-group">
+              <label for="brand">Brand</label>
+              <input
+                id="brand"
+                type="text"
+                class="form-control"
+                placeholder="Insert brand of a product"
+              />
+            </div>
+            <div class="form-group">
+              <label for="imageUrl">Link to image of a product</label>
+              <input
+                id="imageUrl"
+                type="text"
+                class="form-control"
+                placeholder="Insert image URL here"
+              />
+            </div>
+            <div class="form-group">
+              <label for="price">Price of a product</label>
+              <input
+                id="price"
+                type="text"
+                class="form-control"
+                placeholder="Insert price here €"
+              />
+            </div>
+            <button id="submitBtn" type="submit" class="btn btn-primary">Submit information</button>
+            <button id="editBtn" type="submit" class="d-none btn btn-success">Edit Information</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Script(s) -->
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+    // TOKEN
+    const token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MTRiMWJlNjRiYjUzZDAwMTViMTllY2IiLCJpYXQiOjE2MzIzMTIyOTQsImV4cCI6MTYzMzUyMTg5NH0.3CzDPp4QqBgiD6bLQdmJvbu5eazZmxZjDOXlu7ADoEA";
+
+    // ENDPOINT
+    const endpoint = "https://striveschool-api.herokuapp.com/api/product/";
+    
+    // SEARCH PARAMETERS - ID
+    const queryId = new URLSearchParams(window.location.search).get("id");
+
+    // HANDLE HTTP-REQUEST FOR "POST"
+    async function postRequest(body) {
+      try {
+      // HTTP-request:
+      let response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": token
+        },
+        body: JSON.stringify(body)
+      })
+
+      if(response.ok) {
+        // Get the data from server response:
+        let responseData = await response.json();
+
+        // Alert the updated info:
+        alert(`Product added to the list of products successfully! \n
+        Name: ${responseData.name},\n
+        Brand: ${responseData.brand},\n
+        Price: ${responseData.price},\n
+        Category: ${responseData.category},\n
+        createdAt: ${responseData.createdAt}`);
+        // Re-Direct to Home Page:
+        window.location.assign("./index.html");
+        /*  
+        // Empty the form values:
+        document.getElementById("nameInput").value = "";
+        document.getElementById("descriptionInput").value = "";
+        document.getElementById("brandInput").value = "";
+        document.getElementById("imgLinkInput").value = "";
+        document.getElementById("priceInput").value = ""; 
+        */
+      } else {
+        throw response;
+      }
+      } catch(error) {
+        console.log(error);
+      } finally {
+        console.log("FINALLY!");
+      }
+    }
+
+    // EVENT HANDLER FOR SUBMIT BUTTON CLICK:
+    function handleSubmit(event) {
+      // Prevent default behavior of form -> Page reload:
+      event.preventDefault();
+
+      // Gather values from form:
+      let requestBody = {
+        name: document.getElementById("name").value,
+        description: document.getElementById("description").value,
+        brand: document.getElementById("brand").value,
+        imageUrl:document.getElementById("imageUrl").value,
+        price: document.getElementById("price").value,
+        category: document.getElementById("category").value
+      }
+      // make POST request, include requestBody object as an argument:
+      postRequest(requestBody);
+    }
+    let submitBtn = document.getElementById("submitBtn");
+    submitBtn.addEventListener("click", handleSubmit);
+
+    // EVENT HANDLER FOR EDIT BUTTON CLICK - "PUT" HTTP REQUEST:
+    async function handleEditRequest(event) {
+      // Prevent default behavior of form -> Page reload:
+      event.preventDefault();
+
+      // Gather values from form:
+      let requestBody = {
+        name: document.getElementById("name").value,
+        description: document.getElementById("description").value,
+        brand: document.getElementById("brand").value,
+        imageUrl: document.getElementById("imageUrl").value,
+        price: document.getElementById("price").value,
+        category: document.getElementById("category").value
+      }
+
+      try {
+        let response = await fetch(endpoint + queryId, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": token
+          },
+          body: JSON.stringify(requestBody)
+        })
+
+        if(response.ok) {
+          let editedProduct = await response.json();
+          let {createdAt, brand, name, description, price} = editedProduct;
+          // Change formContainer information to alert: 
+          let formContainer = document.querySelector(".formContainer");
+          formContainer.innerHTML = `
+            <div class="alert alert-success" role="alert">
+              <h3>Product was edited successfully:</h3>
+              <div class="">
+              <div class="d-flex justify-content-between mt-5">
+                <p class="m-0 p-0"><b>Created at:</b></p>
+                <p>${createdAt}</p>
+              </div>
+              <div class="d-flex justify-content-between">
+                <p class="m-0 p-0"><b>Brand:</b></p>
+                <p>${brand}</p>
+              </div>
+              <div class="d-flex justify-content-between">
+                <p class="m-0 p-0"><b>Name:</b></p>
+                <p>${name}</p>
+              </div>
+              <div class="d-flex justify-content-between">
+                <p class="m-0 p-0"><b>Description:</b></p>
+                <p>${description}</p>
+              </div>
+              <div class="d-flex justify-content-between">
+                <p class=""><b>Price:</b></p>
+                <p>${price}</p>
+              </div>
+              <div class="d-flex justify-content-between">
+                <p class=""><b>Price:</b></p>
+                <p>${category}</p>
+              </div>
+              </div>
+            </div>`;
+          // After delay, re-direct to homepage:
+          setTimeout(() => {
+            window.location.assign("./index.html");
+          }, 3000);
+
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        console.log("Finally?");
+      }
+    }
+
+    // HANDLE HTTP-REQUEST FOR PRODUCT INFO AND POPULATE FORM VALUES:
+    async function editData(queryId) {
+      // Hide Submit Information button:
+      document.getElementById("submitBtn").classList.add("d-none");
+      // Reveal Edit button:
+      let editBtn = document.getElementById("editBtn");
+      editBtn.classList.remove("d-none");
+    
+      // Fetch product information:
+      try {
+        let response = await fetch(endpoint + queryId, {
+          headers: {
+          "Authorization": token
+        }})
+
+        if(response.ok) {
+          let product = await response.json();
+          console.log(product);
+
+          // Populate form with product information:
+          let {name, brand, description, price, imageUrl} = product;
+
+          let formHtmlCollection = document.querySelector("form").children;
+          let formAsArray = Array.from(formHtmlCollection);
+
+          document.getElementById("name").value = name;
+          document.getElementById("description").value = description;
+          document.getElementById("brand").value = brand;
+          document.getElementById("imageUrl").value = imageUrl;
+          document.getElementById("price").value = price;
+          
+          // Add eventlistener to edit button:
+          editBtn.addEventListener("click", handleEditRequest);
+
+        } else {
+          throw "Error";
+        }
+
+      } catch(error) {
+        console.log(error);
+      } finally {
+        console.log("finally!");
+      }
+    }
+
+
+    window.onload = () => {
+      if(queryId) {
+        editData(queryId);
+      }
+    }
+
+    </script>
+  </body>
+</html>

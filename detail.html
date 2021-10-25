@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+      integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+      crossorigin="anonymous"
+    />
+    <title>Document</title>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav
+      class="
+        navbar navbar-light
+        bg-light
+        justify-content-start
+        align-items-baseline
+      "
+    >
+      <a class="navbar-brand" href="./index.html">
+        <img
+          src="https://coursereport-s3-production.global.ssl.fastly.net/rich/rich_files/rich_files/6256/s300/strive-20school-20logo.png"
+          width="30"
+          height="30"
+          class="d-inline-block align-top"
+          alt=""
+        />
+        Strivazon
+      </a>
+      <div>
+        <ul class="navbar-nav flex-row">
+          <li class="nav-item mr-3">
+            <a class="nav-link p-0" href="./index.html"
+              >Home<span class="sr-only">(current)</span></a
+            >
+          </li>
+          <li class="nav-item mr-3">
+            <a class="nav-link p-0" href="./backoffice.html">Back Office</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link p-0 d-none detailLink" href="./backoffice.html">Detail</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Form -->
+    <div class="container">
+      <h2 class="text-center mt-5">Product details</h2>
+      <div class="row justify-content-center mt-3">
+        <div class="col-md-8">
+          <div  id="detailContainer">
+
+          </div>
+          <div class="d-flex justify-content-between">
+            <button id="editBtn" class="d-none btn btn-primary">Edit product information</button>
+            <button id="deleteBtn" class="d-none btn btn-danger">Delete product information</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Script(s) -->
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      // Reveal detail link within navigation, otherwise it is hidden:
+      document.querySelector(".detailLink").classList.remove("d-none");
+      // TOKEN
+      const token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MTRiMWJlNjRiYjUzZDAwMTViMTllY2IiLCJpYXQiOjE2MzIzMTIyOTQsImV4cCI6MTYzMzUyMTg5NH0.3CzDPp4QqBgiD6bLQdmJvbu5eazZmxZjDOXlu7ADoEA";
+      // ENDPOINT
+      const endpoint = "https://striveschool-api.herokuapp.com/api/product/";
+      // SEARCH PARAMETER - ID
+      const queryId = new URLSearchParams(window.location.search).get("id");
+
+      // Edit and Delete buttons:
+      let editBtn = document.getElementById("editBtn");
+      let deleteBtn = document.getElementById("deleteBtn");
+
+
+      // FETCH PRODUCT DATA AND DISPLAY DATA
+      async function displayData(queryId) {
+          try {
+          let response = await fetch(endpoint + queryId, {
+            headers: {
+            "Authorization": token
+          }
+          });
+          if(response.ok) {
+            // Display buttons:
+            editBtn.classList.remove("d-none");
+            deleteBtn.classList.remove("d-none");
+            // Add eventListener for Edit Button:
+            editBtn.addEventListener("click", handleEdit);
+            // Add eventListener for Delete Button:
+            deleteBtn.addEventListener("click", handleDelete);
+
+            let dataObject = await response.json();
+            console.log(dataObject);
+
+            let {imageUrl, name, description, brand, createdAt, price} = dataObject;
+
+            let detailContainer = document.getElementById("detailContainer");
+            detailContainer.innerHTML = `
+            <div>
+              <img src="${imageUrl}" alt="" style="object-fit: cover; width:  100%">
+            </div>
+            <div id="detailStart" class="d-flex justify-content-between mt-5">
+              <p class="m-0 p-0"><b>Created at:</b></p>
+              <p>${createdAt}</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p class="m-0 p-0"><b>Brand:</b></p>
+              <p>${brand}</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p class="m-0 p-0"><b>Name:</b></p>
+              <p>${name}</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p class="m-0 p-0"><b>Description:</b></p>
+              <p>${description}</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p class=""><b>Price:</b></p>
+              <p>${price}</p>
+            </div>
+            <hr>`;
+
+          } else {
+            throw "Something went wrong!";
+          }
+
+        } catch (error) {
+          console.log(error);
+        } finally {
+          console.log("Finally!");
+        }
+        }
+
+
+      // EVENT HANDLER FOR EDIT BUTTON:
+      function handleEdit() {
+        window.location.assign(`./backoffice.html?id=${queryId}`);
+      }
+      // EVENT HANDLER FOR DELETE BUTTON:
+      async function handleDelete() {
+        try {
+          let response = await fetch(endpoint + queryId, {
+            method: "DELETE",
+            headers: {
+              "Authorization": token
+            }
+          })
+
+        if(response.ok) {
+          // Create alert element:
+          let deleteInfo = document.createElement("div");
+          deleteInfo.innerHTML = `
+          <div class="alert alert-success" role="alert">
+            Product was deleted successfully!
+          </div>`;
+
+          // Insert alert after details container:
+          let detailContainer = document.getElementById("detailContainer");
+          detailContainer.after(deleteInfo);
+
+          // Hide alert after 2 seconds:
+          setTimeout(() => {
+            deleteInfo.innerHTML = "";
+          }, 2000)
+          // Re-direct back to homepage:
+          setTimeout(() => {
+            window.location.assign("./index.html");
+          }, 2000);
+        }
+
+        } catch (error) {
+          console.log(error);
+        } finally {
+          console.log("Finally!");
+        }
+
+      }
+
+
+      window.onload = async () => {
+        displayData(queryId);
+      }
+
+    </script>

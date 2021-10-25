@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+  <title>Document</title>
+</head>
+<body>
+
+<nav class="navbar navbar-light bg-light justify-content-start align-items-baseline">
+  <a class="navbar-brand" href="#">
+    <img src="https://coursereport-s3-production.global.ssl.fastly.net/rich/rich_files/rich_files/6256/s300/strive-20school-20logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
+    Strivazon
+  </a>
+  <div>
+    <ul class="navbar-nav flex-row">
+        <li class="nav-item mr-3 active">
+          <a class="nav-link p-0" href="#">Home<span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-0" href="./backoffice.html">Back Office</a>
+        </li>
+      </ul>
+  </div>
+</nav>
+
+<!-- Data container -->
+<div class="container">
+  <div class="row productContainer">
+    
+  </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
+
+<script>
+
+  const url = "http://localhost:3001/products";
+
+  async function fetchData(url) {
+    try {
+      let response = await fetch(url);
+      if(response.ok) {
+        let data = await response.json();
+        console.log(data);
+        return data;
+      } else {
+        // Can I actually just throw response??
+        throw response;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+
+  function displayData(productList, containerNode) {
+    let productContainer = document.querySelector(`.${containerNode}`);
+
+    productList.forEach(product => {
+      console.log(product.imageUrl);
+      productContainer.innerHTML += `<div class="col-4">
+        <div class="p-2">
+          <div>
+            <img src=${product.imageUrl} alt="" style="width: 100%; height: 200px; object-fit: cover;">
+          </div>
+          <div class="mt-2 d-flex flex-column justify-content-between">
+            <h6 class="p-0 m-0">${product.brand}</h6>
+            <p class="p-0 m-0">${product.name}</p>
+            <p class="p-0 m-0">${product.description}</p>
+            <p class="p-0 m-0">${product.category}</p>
+            <a class="p-0 m-0" href="./detail.html?id=${product._id}">VIEW DETAILS</a>
+            <p class="p-0 m-0 text-right">${product.price} €</p>
+          </div>
+        </div>
+      </div>`;
+    });
+  }
+
+
+  window.onload = async () => {
+    let productList = await fetchData(url);
+    displayData(productList, "productContainer");
+  }
+</script>
+</body>
+</html>
